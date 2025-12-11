@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Конвертер фото ↔ строка</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      min-height: 80vh;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #ff6a00;
+      font-size: 2.2em;
+      margin-bottom: 30px;
+      grid-column: 1 / -1;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .panel {
+      background: #fffaf5;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 15px rgba(255, 106, 0, 0.1);
+      border: 1px solid #ffe0cc;
+    }
+    
+    .panel h2 {
+      color: #cc5500;
+      margin-bottom: 20px;
+      font-size: 1.4em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .section {
+      margin-bottom: 25px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 12px;
+      font-weight: 600;
+      color: #cc5500;
+      font-size: 1.1em;
+    }
+    
+    input[type="file"] {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 15px;
+      border: 2px dashed #ffa366;
+      border-radius: 8px;
+      background: #fff5eb;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    
+    input[type="file"]:hover {
+      border-color: #ff6a00;
+      background: #ffebd9;
+    }
+    
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 15px;
+      border: 2px solid #ffa366;
+      border-radius: 8px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      resize: vertical;
+      font-size: 13px;
+      line-height: 1.4;
+      transition: border-color 0.3s ease;
+      background: #fffaf5;
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: #ff6a00;
+      box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.1);
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #ff9a00 0%, #ff6a00 100%);
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      flex: 1;
+      min-width: 160px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 106, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 106, 0, 0.3);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button.secondary {
+      background: linear-gradient(135deg, #ff8c42 0%, #e65c00 100%);
+      box-shadow: 0 4px 15px rgba(255, 140, 66, 0.2);
+    }
+    
+    button.secondary:hover {
+      box-shadow: 0 6px 20px rgba(255, 140, 66, 0.3);
+    }
+    
+    .file-input-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 160px;
+    }
+    
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
+      z-index: 2;
+    }
+    
+    .file-input-button {
+      display: block;
+      width: 100%;
+      text-align: center;
+      margin: 0;
+      pointer-events: none;
+      z-index: 1;
+      position: relative;
+    }
+    
+    .preview-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+    
+    .preview {
+      border: 2px dashed #ffa366;
+      border-radius: 8px;
+      padding: 20px;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fffaf5;
+      transition: border-color 0.3s ease;
+    }
+    
+    .preview:hover {
+      border-color: #ff6a00;
+    }
+    
+    .preview img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 6px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .preview-placeholder {
+      color: #ff8c42;
+      font-style: italic;
+    }
+    
+    .status {
+      padding: 12px 16px;
+      margin: 15px 0;
+      border-radius: 8px;
+      font-weight: 500;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .status.success {
+      background: #ffe6cc;
+      color: #cc5500;
+      border: 1px solid #ffd9b3;
+    }
+    
+    .status.error {
+      background: #ffddcc;
+      color: #cc4400;
+      border: 1px solid #ffccb3;
+    }
+    
+    .status.info {
+      background: #fff0e0;
+      color: #cc5500;
+      border: 1px solid #ffddcc;
+    }
+    
+    .tools-panel {
+      grid-column: 1 / -1;
+      background: #fffaf5;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 10px;
+      border: 1px solid #ffe0cc;
+    }
+    
+    .tools-panel h3 {
+      color: #cc5500;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .tool-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    
+    .file-info {
+      background: #ffe6cc;
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-size: 0.9em;
+      color: #cc5500;
+    }
+    
+    /* Анимации */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .panel {
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    /* Адаптивность для мобильных */
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 20px;
+      }
+      
+      h1 {
+        font-size: 1.8em;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      button, .file-input-wrapper {
+        width: 100%;
+        min-width: auto;
+      }
+      
+      body {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🖼️ Конвертер изображений ↔ Base64</h1>
+    
+    <!-- Левая панель: Изображение в Base64 -->
+    <div class="panel">
+      <h2>📷 Изображение → Base64</h2>
+      
+      <div class="section">
+        <label>Выберите изображение:</label>
+        <input type="file" id="imageInput" accept="image/*" />
+        <div class="file-info" id="fileInfo" style="display: none;"></div>
+        
+        <div class="button-group">
+          <button id="convertToTextBtn">🔄 Преобразовать в Base64</button>
+        </div>
+        
+        <div class="preview-container">
+          <div class="preview" id="inputPreview">
+            <div class="preview-placeholder">Здесь появится выбранное изображение</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Правая панель: Base64 в изображение -->
+    <div class="panel">
+      <h2>📄 Base64 → Изображение</h2>
+      
+      <div class="section">
+        <label>Строка Base64:</label>
+        <textarea id="base64String" placeholder="Вставьте Base64 строку или сгенерируйте её из изображения..."></textarea>
+        
+        <div class="button-group">
+          <button id="convertToImageBtn">🖼️ Восстановить изображение</button>
+          <div class="file-input-wrapper">
+            <input type="file" id="txtInput" accept=".txt" />
+            <button class="file-input-button secondary">📂 Загрузить из TXT</button>
+          </div>
+        </div>
+        
+        <div class="preview-container">
+          <div class="preview" id="outputPreview">
+            <div class="preview-placeholder">Здесь появится восстановленное изображение</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Панель инструментов -->
+    <div class="tools-panel">
+      <h3>🛠️ Дополнительные инструменты</h3>
+      <div class="tool-buttons">
+        <button id="saveToTxtBtn">💾 Сохранить Base64 в TXT</button>
+        <button id="clearAllBtn">🗑️ Очистить всё</button>
+        <button id="copyBase64Btn">📋 Копировать Base64</button>
+        <button id="validateBase64Btn">✅ Проверить Base64</button>
+      </div>
+    </div>
+    
+    <div id="statusMessage" class="status" style="display: none;"></div>
+  </div>
+
+  <script>
+    // Элементы DOM
+    const elements = {
+      imageInput: document.getElementById('imageInput'),
+      txtInput: document.getElementById('txtInput'),
+      base64Textarea: document.getElementById('base64String'),
+      inputPreview: document.getElementById('inputPreview'),
+      outputPreview: document.getElementById('outputPreview'),
+      statusMessage: document.getElementById('statusMessage'),
+      fileInfo: document.getElementById('fileInfo'),
+      convertToTextBtn: document.getElementById('convertToTextBtn'),
+      convertToImageBtn: document.getElementById('convertToImageBtn'),
+      saveToTxtBtn: document.getElementById('saveToTxtBtn'),
+      clearAllBtn: document.getElementById('clearAllBtn'),
+      copyBase64Btn: document.getElementById('copyBase64Btn'),
+      validateBase64Btn: document.getElementById('validateBase64Btn')
+    };
+
+    // Показ статуса
+    function showStatus(message, type = 'info') {
+      elements.statusMessage.textContent = message;
+      elements.statusMessage.className = `status ${type}`;
+      elements.statusMessage.style.display = 'block';
+      
+      setTimeout(() => {
+        elements.statusMessage.style.display = 'none';
+      }, 4000);
+    }
+
+    // Показ загрузки на кнопке
+    function showButtonLoading(button, text) {
+      const originalText = button.innerHTML;
+      button.innerHTML = '⏳ ' + text;
+      button.disabled = true;
+      
+      return () => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+      };
+    }
+
+    // Форматирование размера файла
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Показ информации о файле
+    function showFileInfo(file) {
+      if (!file) {
+        elements.fileInfo.style.display = 'none';
+        return;
+      }
+      
+      const fileSize = formatFileSize(file.size);
+      const fileType = file.type || 'Неизвестный тип';
+      elements.fileInfo.innerHTML = `
+        <strong>Информация о файле:</strong><br>
+        📁 Имя: ${file.name}<br>
+        📊 Размер: ${fileSize}<br>
+        🏷️ Тип: ${fileType}
+      `;
+      elements.fileInfo.style.display = 'block';
+    }
+
+    // Преобразование изображения в Base64
+    elements.convertToTextBtn.addEventListener('click', function() {
+      const file = elements.imageInput.files[0];
+      if (!file) {
+        showStatus('Сначала выберите изображение', 'error');
+        return;
+      }
+
+      // Проверка размера файла (увеличим лимит для desktop)
+      if (file.size > 10 * 1024 * 1024) {
+        showStatus('Изображение слишком большое. Выберите файл до 10MB.', 'error');
+        return;
+      }
+
+      const resetButton = showButtonLoading(this, 'Конвертируем...');
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const fullDataUrl = e.target.result;
+          const base64 = fullDataUrl.split(',')[1];
+          elements.base64Textarea.value = base64;
+          
+          // Показываем превью
+          elements.inputPreview.innerHTML = `<img src="${fullDataUrl}" alt="Исходное изображение">`;
+          
+          showStatus(`✅ Изображение успешно преобразовано! Base64 длина: ${base64.length} символов`);
+        } catch (error) {
+          showStatus('❌ Ошибка при преобразовании: ' + error.message, 'error');
+        } finally {
+          resetButton();
+        }
+      };
+      
+      reader.onerror = function() {
+        showStatus('❌ Ошибка при чтении файла', 'error');
+        resetButton();
+      };
+      
+      reader.readAsDataURL(file);
+    });
+
+    // Восстановление изображения из Base64
+    elements.convertToImageBtn.addEventListener('click', function() {
+      const base64 = elements.base64Textarea.value.trim();
+      if (!base64) {
+        showStatus('Поле Base64 пустое', 'error');
+        return;
+      }
+
+      const resetButton = showButtonLoading(this, 'Восстанавливаем...');
+
+      try {
+        // Определяем MIME-тип
+        let mimeType = 'image/png';
+        if (base64.startsWith('/9j/') || base64.startsWith('/9j/4AAQ')) mimeType = 'image/jpeg';
+        else if (base64.startsWith('R0lGODlh')) mimeType = 'image/gif';
+        else if (base64.startsWith('UklGR')) mimeType = 'image/webp';
+        else if (base64.startsWith('Qk0')) mimeType = 'image/bmp';
+
+        const dataUrl = `data:${mimeType};base64,${base64}`;
+        
+        // Создаем изображение для проверки
+        const img = new Image();
+        img.onload = function() {
+          elements.outputPreview.innerHTML = `<img src="${dataUrl}" alt="Восстановленное изображение">`;
+          showStatus('✅ Изображение успешно восстановлено!');
+          resetButton();
+        };
+        img.onerror = function() {
+          showStatus('❌ Ошибка: неверный формат Base64 строки', 'error');
+          elements.outputPreview.innerHTML = '<div class="preview-placeholder">Не удалось восстановить изображение</div>';
+          resetButton();
+        };
+        img.src = dataUrl;
+      } catch (error) {
+        showStatus('❌ Произошла ошибка: ' + error.message, 'error');
+        resetButton();
+      }
+    });
+
+    // Сохранение Base64 в TXT-файл
+    elements.saveToTxtBtn.addEventListener('click', function() {
+      const base64 = elements.base64Textarea.value.trim();
+      if (!base64) {
+        showStatus('Нет данных для сохранения', 'error');
+        return;
+      }
+
+      const resetButton = showButtonLoading(this, 'Сохранение...');
+
+      try {
+        const blob = new Blob([base64], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `image_base64_${new Date().getTime()}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        showStatus('💾 Файл успешно сохранен!');
+        resetButton();
+      } catch (error) {
+        showStatus('❌ Ошибка при сохранении: ' + error.message, 'error');
+        resetButton();
+      }
+    });
+
+    // Загрузка Base64 из TXT-файла - ИСПРАВЛЕННАЯ ФУНКЦИЯ
+    elements.txtInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) {
+        showStatus('Файл не выбран', 'error');
+        return;
+      }
+
+      // Проверяем расширение файла
+      if (!file.name.toLowerCase().endsWith('.txt')) {
+        showStatus('Пожалуйста, выберите TXT-файл', 'error');
+        this.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const text = e.target.result.trim();
+          
+          // Проверяем, что загруженный текст похож на Base64
+          if (text.length < 20 || !/^[A-Za-z0-9+/]*={0,2}$/.test(text)) {
+            showStatus('Файл не содержит валидную Base64 строку', 'error');
+            return;
+          }
+          
+          elements.base64Textarea.value = text;
+          showStatus('📂 Base64 строка успешно загружена из файла!');
+        } catch (error) {
+          showStatus('❌ Ошибка при загрузке файла: ' + error.message, 'error');
+        }
+      };
+      
+      reader.onerror = function() {
+        showStatus('❌ Ошибка при чтении файла', 'error');
+      };
+      
+      reader.readAsText(file, 'utf-8');
+    });
+
+    // Копирование Base64 в буфер обмена
+    elements.copyBase64Btn.addEventListener('click', function() {
+      const base64 = elements.base64Textarea.value.trim();
+      if (!base64) {
+        showStatus('Нет данных для копирования', 'error');
+        return;
+      }
+
+      navigator.clipboard.writeText(base64).then(() => {
+        showStatus('📋 Base64 скопирован в буфер обмена!');
+      }).catch(err => {
+        // Fallback для старых браузеров
+        elements.base64Textarea.select();
+        document.execCommand('copy');
+        showStatus('📋 Base64 скопирован в буфер обмена!');
+      });
+    });
+
+    // Проверка валидности Base64
+    elements.validateBase64Btn.addEventListener('click', function() {
+      const base64 = elements.base64Textarea.value.trim();
+      if (!base64) {
+        showStatus('Нет данных для проверки', 'error');
+        return;
+      }
+
+      try {
+        // Простая проверка Base64
+        const binaryString = atob(base64);
+        showStatus('✅ Base64 строка валидна!');
+      } catch (error) {
+        showStatus('❌ Base64 строка невалидна', 'error');
+      }
+    });
+
+    // Очистка всего
+    elements.clearAllBtn.addEventListener('click', function() {
+      elements.imageInput.value = '';
+      elements.txtInput.value = '';
+      elements.base64Textarea.value = '';
+      elements.inputPreview.innerHTML = '<div class="preview-placeholder">Здесь появится выбранное изображение</div>';
+      elements.outputPreview.innerHTML = '<div class="preview-placeholder">Здесь появится восстановленное изображение</div>';
+      elements.fileInfo.style.display = 'none';
+      showStatus('🗑️ Все данные очищены');
+    });
+
+    // Показ превью при выборе изображения
+    elements.imageInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      showFileInfo(file);
+
+      if (file.size > 10 * 1024 * 1024) {
+        showStatus('Изображение слишком большое. Выберите файл до 10MB.', 'error');
+        this.value = '';
+        elements.fileInfo.style.display = 'none';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        elements.inputPreview.innerHTML = `<img src="${e.target.result}" alt="Выбранное изображение">`;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Автофокус на текстовую область при загрузке
+    window.addEventListener('load', function() {
+      showStatus('👆 Выберите изображение или вставьте Base64 строку для начала работы', 'info');
+    });
+
+    // Горячие клавиши
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey)) {
+        switch(e.key) {
+          case 's':
+            e.preventDefault();
+            elements.saveToTxtBtn.click();
+            break;
+          case 'c':
+            if (elements.base64Textarea === document.activeElement) {
+              elements.copyBase64Btn.click();
+            }
+            break;
+          case 'd':
+            e.preventDefault();
+            elements.clearAllBtn.click();
+            break;
+        }
+      }
+    });
+
+    // Показ горячих клавиш при наведении
+    const tooltips = {
+      saveToTxtBtn: 'Ctrl+S',
+      copyBase64Btn: 'Ctrl+C',
+      clearAllBtn: 'Ctrl+D'
+    };
+
+    Object.keys(tooltips).forEach(btnId => {
+      const btn = elements[btnId];
+      if (btn) {
+        btn.title = tooltips[btnId];
+      }
+    });
+  </script>
+</body>
+</html>
