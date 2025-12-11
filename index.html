@@ -21,7 +21,7 @@
     }
     
     .container {
-      max-width: 1200px;
+      max-width: 1600px;
       margin: 0 auto;
       background: white;
       padding: 30px;
@@ -89,7 +89,7 @@
     
     textarea {
       width: 100%;
-      height: 200px;
+      height: 180px;
       padding: 15px;
       border: 2px solid #ffa366;
       border-radius: 8px;
@@ -270,17 +270,185 @@
       color: #cc5500;
     }
     
+    /* НОВЫЕ СТИЛИ ДЛЯ ПАНЕЛИ СЖАТИЯ */
+    .compression-panel {
+      grid-column: 1 / -1;
+      background: #fffaf5;
+      border-radius: 12px;
+      padding: 25px;
+      margin-top: 20px;
+      border: 1px solid #ffe0cc;
+      box-shadow: 0 4px 15px rgba(255, 106, 0, 0.1);
+    }
+    
+    .compression-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    
+    .compression-column {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .compression-stats {
+      background: #ffe6cc;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .stat-box {
+      background: white;
+      padding: 15px;
+      border-radius: 6px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .stat-value {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #ff6a00;
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      font-size: 0.9em;
+      color: #cc5500;
+    }
+    
+    .compression-center {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 0;
+    }
+    
+    .compression-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+    
+    .compression-buttons button {
+      min-width: 100%;
+    }
+    
+    .compression-algorithms {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 15px 0;
+      width: 100%;
+    }
+    
+    .algorithm-btn {
+      background: #fff5eb;
+      border: 2px solid #ffa366;
+      color: #cc5500;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    
+    .algorithm-btn.active {
+      background: #ff6a00;
+      color: white;
+      border-color: #ff6a00;
+    }
+    
+    .algorithm-btn:hover:not(.active) {
+      background: #ffebd9;
+      border-color: #ff6a00;
+    }
+    
+    .log-output {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 15px;
+    }
+    
+    .log-entry {
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .column-header h3 {
+      color: #cc5500;
+      font-size: 1.1em;
+      margin: 0;
+    }
+    
+    .copy-btn-small {
+      background: #ffa366;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .copy-btn-small:hover {
+      background: #ff8c42;
+    }
+    
     /* Анимации */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
     
-    .panel {
+    .panel, .compression-panel {
       animation: fadeIn 0.5s ease-out;
     }
     
     /* Адаптивность для мобильных */
+    @media (max-width: 1200px) {
+      .compression-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      
+      .compression-center {
+        order: -1;
+        padding: 0;
+      }
+    }
+    
     @media (max-width: 768px) {
       .container {
         grid-template-columns: 1fr;
@@ -303,6 +471,20 @@
       
       body {
         padding: 10px;
+      }
+      
+      .compression-buttons {
+        flex-direction: column;
+      }
+      
+      .compression-algorithms {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      
+      .algorithm-btn {
+        flex: 1;
+        min-width: 120px;
       }
     }
   </style>
@@ -356,6 +538,104 @@
       </div>
     </div>
     
+    <!-- НОВАЯ ПАНЕЛЬ: Сжатие Base64 -->
+    <div class="compression-panel">
+      <h2>📦 Сжатие Base64 строк</h2>
+      
+      <div class="compression-grid">
+        <!-- Левая колонка: Исходный Base64 -->
+        <div class="compression-column">
+          <div class="column-header">
+            <h3>Исходный Base64</h3>
+            <button class="copy-btn-small" id="copyOriginalBtn">Копировать</button>
+          </div>
+          <textarea id="compressionInput" placeholder="Base64 строка для сжатия..."></textarea>
+          <div class="button-group">
+            <button id="validateOriginalBtn">✅ Проверить</button>
+            <button id="loadFromImageBtn">🖼️ Загрузить из изображения</button>
+          </div>
+        </div>
+        
+        <!-- Центральная колонка: Управление -->
+        <div class="compression-center">
+          <div class="compression-algorithms" id="algorithmButtons">
+            <button class="algorithm-btn active" data-algorithm="gzip">Gzip</button>
+            <button class="algorithm-btn" data-algorithm="deflate">Deflate</button>
+            <button class="algorithm-btn" data-algorithm="deflate-raw">Deflate-raw</button>
+          </div>
+          
+          <div class="compression-buttons">
+            <button id="compressBtn" class="secondary">📦 Сжать →</button>
+            <button id="decompressBtn" class="secondary">← Распаковать</button>
+            <button id="autoCompressBtn">🔁 Авто-сжатие</button>
+            <button id="compareBtn">📊 Сравнить алгоритмы</button>
+          </div>
+          
+          <div class="compression-buttons">
+            <button id="swapFieldsBtn">🔄 Поменять местами</button>
+            <button id="clearCompressionBtn">🗑️ Очистить</button>
+          </div>
+        </div>
+        
+        <!-- Правая колонка: Сжатый и Распакованный Base64 -->
+        <div class="compression-column">
+          <div class="column-header">
+            <h3>Сжатый Base64</h3>
+            <button class="copy-btn-small" id="copyCompressedBtn">Копировать</button>
+          </div>
+          <textarea id="compressionOutput" placeholder="Сжатая строка появится здесь..." readonly></textarea>
+          <div class="button-group">
+            <button id="useForImageBtn">🖼️ Использовать для изображения</button>
+            <button id="saveCompressedBtn">💾 Сохранить как TXT</button>
+          </div>
+          
+          <div class="column-header" style="margin-top: 20px;">
+            <h3>Распакованный Base64</h3>
+            <button class="copy-btn-small" id="copyDecompressedBtn">Копировать</button>
+          </div>
+          <textarea id="decompressedOutput" placeholder="Распакованная строка появится здесь..." readonly></textarea>
+          <div class="button-group">
+            <button id="useDecompressedBtn">🖼️ Использовать распакованный</button>
+            <button id="verifyIntegrityBtn">✅ Проверить целостность</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="compression-stats">
+        <h3>📊 Статистика сжатия</h3>
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-box">
+            <div class="stat-value" id="originalSize">0</div>
+            <div class="stat-label">Исходный размер</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="compressedSize">0</div>
+            <div class="stat-label">Сжатый размер</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="compressionRatio">0%</div>
+            <div class="stat-label">Степень сжатия</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="algorithmUsed">-</div>
+            <div class="stat-label">Алгоритм</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="decompressedSize">0</div>
+            <div class="stat-label">Распакованный размер</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="integrityStatus">-</div>
+            <div class="stat-label">Целостность</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="log-output" id="compressionLog">
+        <div class="log-entry">Журнал сжатия: готов к работе</div>
+      </div>
+    </div>
+    
     <!-- Панель инструментов -->
     <div class="tools-panel">
       <h3>🛠️ Дополнительные инструменты</h3>
@@ -371,7 +651,7 @@
   </div>
 
   <script>
-    // Элементы DOM
+    // Элементы DOM для основной части
     const elements = {
       imageInput: document.getElementById('imageInput'),
       txtInput: document.getElementById('txtInput'),
@@ -387,6 +667,126 @@
       copyBase64Btn: document.getElementById('copyBase64Btn'),
       validateBase64Btn: document.getElementById('validateBase64Btn')
     };
+
+    // Элементы DOM для сжатия
+    const compressionElements = {
+      input: document.getElementById('compressionInput'),
+      output: document.getElementById('compressionOutput'),
+      decompressed: document.getElementById('decompressedOutput'),
+      compressBtn: document.getElementById('compressBtn'),
+      decompressBtn: document.getElementById('decompressBtn'),
+      autoCompressBtn: document.getElementById('autoCompressBtn'),
+      compareBtn: document.getElementById('compareBtn'),
+      copyOriginalBtn: document.getElementById('copyOriginalBtn'),
+      copyCompressedBtn: document.getElementById('copyCompressedBtn'),
+      copyDecompressedBtn: document.getElementById('copyDecompressedBtn'),
+      useForImageBtn: document.getElementById('useForImageBtn'),
+      saveCompressedBtn: document.getElementById('saveCompressedBtn'),
+      useDecompressedBtn: document.getElementById('useDecompressedBtn'),
+      verifyIntegrityBtn: document.getElementById('verifyIntegrityBtn'),
+      validateOriginalBtn: document.getElementById('validateOriginalBtn'),
+      loadFromImageBtn: document.getElementById('loadFromImageBtn'),
+      swapFieldsBtn: document.getElementById('swapFieldsBtn'),
+      clearCompressionBtn: document.getElementById('clearCompressionBtn'),
+      algorithmButtons: document.getElementById('algorithmButtons'),
+      originalSize: document.getElementById('originalSize'),
+      compressedSize: document.getElementById('compressedSize'),
+      decompressedSize: document.getElementById('decompressedSize'),
+      compressionRatio: document.getElementById('compressionRatio'),
+      algorithmUsed: document.getElementById('algorithmUsed'),
+      integrityStatus: document.getElementById('integrityStatus'),
+      compressionLog: document.getElementById('compressionLog')
+    };
+
+    // Текущий выбранный алгоритм
+    let currentAlgorithm = 'gzip';
+
+    // Функции сжатия/распаковки
+    async function compress(string, encoding) {
+      const byteArray = new TextEncoder().encode(string);
+      const cs = new CompressionStream(encoding);
+      const writer = cs.writable.getWriter();
+      writer.write(byteArray);
+      writer.close();
+      return new Response(cs.readable).arrayBuffer();
+    }
+
+    async function decompress(byteArray, encoding) {
+      const cs = new DecompressionStream(encoding);
+      const writer = cs.writable.getWriter();
+      writer.write(byteArray);
+      writer.close();
+      const arrayBuffer = await new Response(cs.readable).arrayBuffer();
+      return new TextDecoder().decode(arrayBuffer);
+    }
+
+    // Вспомогательные функции
+    function arrayBufferToBase64(buffer) {
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    }
+
+    function base64ToArrayBuffer(base64) {
+      const binaryString = atob(base64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+
+    // Логирование для сжатия
+    function logCompression(message, type = 'info') {
+      const time = new Date().toLocaleTimeString();
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      
+      let icon = 'ℹ️';
+      if (type === 'success') icon = '✅';
+      if (type === 'error') icon = '❌';
+      if (type === 'warning') icon = '⚠️';
+      if (type === 'compress') icon = '📦';
+      if (type === 'decompress') icon = '📄';
+      
+      logEntry.innerHTML = `<span>[${time}]</span> ${icon} ${message}`;
+      compressionElements.compressionLog.appendChild(logEntry);
+      compressionElements.compressionLog.scrollTop = compressionElements.compressionLog.scrollHeight;
+      
+      // Ограничиваем количество записей в логе
+      const entries = compressionElements.compressionLog.querySelectorAll('.log-entry');
+      if (entries.length > 50) {
+        entries[0].remove();
+      }
+    }
+
+    // Обновление статистики сжатия
+    function updateCompressionStats(originalSize, compressedSize, decompressedSize, algorithm, integrity = null) {
+      compressionElements.originalSize.textContent = formatFileSize(originalSize);
+      compressionElements.compressedSize.textContent = formatFileSize(compressedSize);
+      compressionElements.decompressedSize.textContent = formatFileSize(decompressedSize);
+      
+      const ratio = compressedSize > 0 ? ((1 - compressedSize / originalSize) * 100).toFixed(2) : 0;
+      compressionElements.compressionRatio.textContent = `${ratio}%`;
+      compressionElements.algorithmUsed.textContent = algorithm.toUpperCase();
+      
+      if (integrity !== null) {
+        compressionElements.integrityStatus.textContent = integrity ? '✅ Цел' : '❌ Нарушена';
+        compressionElements.integrityStatus.style.color = integrity ? '#2ecc71' : '#e74c3c';
+      }
+    }
+
+    // Форматирование размера файла
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
 
     // Показ статуса
     function showStatus(message, type = 'info') {
@@ -411,14 +811,463 @@
       };
     }
 
-    // Форматирование размера файла
-    function formatFileSize(bytes) {
-      if (bytes === 0) return '0 Bytes';
-      const k = 1024;
-      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    // Инициализация кнопок алгоритмов
+    function initAlgorithmButtons() {
+      const buttons = compressionElements.algorithmButtons.querySelectorAll('.algorithm-btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          buttons.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          currentAlgorithm = this.dataset.algorithm;
+          logCompression(`Выбран алгоритм: ${currentAlgorithm.toUpperCase()}`);
+        });
+      });
     }
+
+    // Синхронизация Base64 между основным полем и полем сжатия
+    function syncBase64Fields() {
+      // Когда меняется основное поле Base64, обновляем поле для сжатия
+      elements.base64Textarea.addEventListener('input', function() {
+        if (this.value.trim()) {
+          compressionElements.input.value = this.value;
+          updateStatsFromInput();
+        }
+      });
+      
+      // Когда меняется поле для сжатия, обновляем основное поле
+      compressionElements.input.addEventListener('input', function() {
+        if (this.value.trim()) {
+          elements.base64Textarea.value = this.value;
+          updateStatsFromInput();
+        }
+      });
+      
+      // Когда меняется распакованное поле
+      compressionElements.decompressed.addEventListener('input', function() {
+        updateStatsFromDecompressed();
+      });
+    }
+
+    // Обновление статистики из исходного поля
+    function updateStatsFromInput() {
+      const inputText = compressionElements.input.value.trim();
+      if (inputText) {
+        const originalSize = new TextEncoder().encode(inputText).length;
+        updateCompressionStats(originalSize, 0, 0, '-');
+      }
+    }
+
+    // Обновление статистики из распакованного поля
+    function updateStatsFromDecompressed() {
+      const decompressedText = compressionElements.decompressed.value.trim();
+      if (decompressedText) {
+        const decompressedSize = new TextEncoder().encode(decompressedText).length;
+        compressionElements.decompressedSize.textContent = formatFileSize(decompressedSize);
+      }
+    }
+
+    // ========== ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ СЖАТИЯ ==========
+
+    // Сжатие строки
+    compressionElements.compressBtn.addEventListener('click', async function() {
+      const inputText = compressionElements.input.value.trim();
+      if (!inputText) {
+        showStatus('Введите Base64 строку для сжатия', 'error');
+        return;
+      }
+
+      const resetButton = showButtonLoading(this, 'Сжатие...');
+      logCompression(`Начало сжатия (${currentAlgorithm})...`, 'compress');
+
+      try {
+        console.time('compress');
+        const startTime = performance.now();
+        
+        const compressedData = await compress(inputText, currentAlgorithm);
+        const compressedBase64 = arrayBufferToBase64(compressedData);
+        
+        const endTime = performance.now();
+        console.timeEnd('compress');
+        
+        compressionElements.output.value = compressedBase64;
+        
+        const originalSize = new TextEncoder().encode(inputText).length;
+        const compressedSize = compressedData.byteLength;
+        const timeTaken = (endTime - startTime).toFixed(2);
+        
+        updateCompressionStats(originalSize, compressedSize, 0, currentAlgorithm);
+        logCompression(`Сжатие завершено: ${formatFileSize(originalSize)} → ${formatFileSize(compressedSize)} (${((1 - compressedSize/originalSize)*100).toFixed(2)}% сжатия, ${timeTaken}мс)`, 'success');
+        
+        showStatus(`✅ Сжатие завершено! Экономия: ${((1 - compressedSize/originalSize)*100).toFixed(2)}%`);
+        
+      } catch (error) {
+        logCompression(`Ошибка при сжатии: ${error.message}`, 'error');
+        showStatus('❌ Ошибка при сжатии', 'error');
+        console.error('Compression error:', error);
+      } finally {
+        resetButton();
+      }
+    });
+
+    // Распаковка строки
+    compressionElements.decompressBtn.addEventListener('click', async function() {
+      const compressedText = compressionElements.output.value.trim();
+      if (!compressedText) {
+        showStatus('Нет сжатых данных для распаковки', 'error');
+        return;
+      }
+
+      const resetButton = showButtonLoading(this, 'Распаковка...');
+      logCompression('Начало распаковки...', 'decompress');
+
+      try {
+        console.time('decompress');
+        
+        const compressedData = base64ToArrayBuffer(compressedText);
+        const decompressedText = await decompress(compressedData, currentAlgorithm);
+        
+        console.timeEnd('decompress');
+        
+        compressionElements.decompressed.value = decompressedText;
+        
+        const originalSize = new TextEncoder().encode(compressionElements.input.value.trim()).length;
+        const compressedSize = compressedData.byteLength;
+        const decompressedSize = new TextEncoder().encode(decompressedText).length;
+        
+        // Проверка целостности
+        const integrity = decompressedText === compressionElements.input.value.trim();
+        
+        updateCompressionStats(originalSize, compressedSize, decompressedSize, currentAlgorithm, integrity);
+        
+        if (integrity) {
+          logCompression(`Распаковка завершена: ${decompressedText.length} символов, целостность: ✅`, 'success');
+          showStatus('✅ Распаковка завершена, целостность сохранена!');
+        } else {
+          logCompression(`Распаковка завершена: ${decompressedText.length} символов, целостность: ❌`, 'warning');
+          showStatus('⚠️ Распаковка завершена, но целостность нарушена!', 'warning');
+        }
+        
+      } catch (error) {
+        logCompression(`Ошибка при распаковке: ${error.message}`, 'error');
+        showStatus('❌ Ошибка при распаковке', 'error');
+        console.error('Decompression error:', error);
+      } finally {
+        resetButton();
+      }
+    });
+
+    // Автоматическое сжатие
+    compressionElements.autoCompressBtn.addEventListener('click', async function() {
+      const inputText = compressionElements.input.value.trim();
+      if (!inputText) {
+        showStatus('Введите Base64 строку для авто-сжатия', 'error');
+        return;
+      }
+
+      const resetButton = showButtonLoading(this, 'Авто-сжатие...');
+      logCompression('Запуск авто-сжатия...');
+      
+      const algorithms = ['gzip', 'deflate', 'deflate-raw'];
+      let bestResult = { size: Infinity, algorithm: '', data: null };
+      
+      for (const algo of algorithms) {
+        try {
+          const compressedData = await compress(inputText, algo);
+          const compressedSize = compressedData.byteLength;
+          
+          if (compressedSize < bestResult.size) {
+            bestResult = {
+              size: compressedSize,
+              algorithm: algo,
+              data: arrayBufferToBase64(compressedData)
+            };
+          }
+          
+          logCompression(`${algo}: ${formatFileSize(compressedSize)}`);
+        } catch (error) {
+          logCompression(`Ошибка ${algo}: ${error.message}`, 'error');
+        }
+      }
+      
+      if (bestResult.data) {
+        const buttons = compressionElements.algorithmButtons.querySelectorAll('.algorithm-btn');
+        buttons.forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.algorithm === bestResult.algorithm);
+        });
+        currentAlgorithm = bestResult.algorithm;
+        
+        compressionElements.output.value = bestResult.data;
+        
+        const originalSize = new TextEncoder().encode(inputText).length;
+        updateCompressionStats(originalSize, bestResult.size, 0, bestResult.algorithm);
+        
+        logCompression(`Авто-сжатие завершено. Лучший алгоритм: ${bestResult.algorithm.toUpperCase()}`, 'success');
+        showStatus(`✅ Авто-сжатие: ${bestResult.algorithm.toUpperCase()} (${((1 - bestResult.size/originalSize)*100).toFixed(2)}% сжатия)`);
+      }
+      
+      resetButton();
+    });
+
+    // Сравнение алгоритмов
+    compressionElements.compareBtn.addEventListener('click', async function() {
+      const inputText = compressionElements.input.value.trim();
+      if (!inputText) {
+        showStatus('Введите Base64 строку для сравнения', 'error');
+        return;
+      }
+
+      const resetButton = showButtonLoading(this, 'Сравнение...');
+      logCompression('Запуск сравнения алгоритмов...');
+      
+      const algorithms = ['gzip', 'deflate', 'deflate-raw'];
+      const results = [];
+      const originalSize = new TextEncoder().encode(inputText).length;
+      
+      for (const algo of algorithms) {
+        try {
+          const startTime = performance.now();
+          const compressedData = await compress(inputText, algo);
+          const endTime = performance.now();
+          
+          const compressedSize = compressedData.byteLength;
+          const ratio = ((1 - compressedSize / originalSize) * 100).toFixed(2);
+          const time = (endTime - startTime).toFixed(2);
+          
+          results.push({
+            algorithm: algo,
+            size: compressedSize,
+            ratio: ratio,
+            time: time
+          });
+          
+          logCompression(`${algo.toUpperCase()}: ${formatFileSize(compressedSize)} (${ratio}%, ${time}мс)`);
+        } catch (error) {
+          logCompression(`Ошибка ${algo}: ${error.message}`, 'error');
+        }
+      }
+      
+      // Находим лучший результат
+      const best = results.reduce((best, current) => 
+        current.size < best.size ? current : best, { size: Infinity });
+      
+      if (best.size < Infinity) {
+        compressionElements.output.value = arrayBufferToBase64(await compress(inputText, best.algorithm));
+        
+        const buttons = compressionElements.algorithmButtons.querySelectorAll('.algorithm-btn');
+        buttons.forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.algorithm === best.algorithm);
+        });
+        currentAlgorithm = best.algorithm;
+        
+        updateCompressionStats(originalSize, best.size, 0, best.algorithm);
+        
+        logCompression(`Лучший алгоритм: ${best.algorithm.toUpperCase()} (${best.ratio}% сжатия, ${best.time}мс)`, 'success');
+        showStatus(`✅ Лучший: ${best.algorithm.toUpperCase()} (${best.ratio}% сжатия)`);
+      }
+      
+      resetButton();
+    });
+
+    // Копирование оригинального текста
+    compressionElements.copyOriginalBtn.addEventListener('click', function() {
+      const text = compressionElements.input.value.trim();
+      if (!text) {
+        showStatus('Нет данных для копирования', 'error');
+        return;
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        logCompression('Исходный текст скопирован в буфер обмена', 'success');
+        showStatus('📋 Исходный текст скопирован!');
+      }).catch(err => {
+        compressionElements.input.select();
+        document.execCommand('copy');
+        logCompression('Исходный текст скопирован (старый метод)', 'success');
+        showStatus('📋 Исходный текст скопирован!');
+      });
+    });
+
+    // Копирование сжатого текста
+    compressionElements.copyCompressedBtn.addEventListener('click', function() {
+      const text = compressionElements.output.value.trim();
+      if (!text) {
+        showStatus('Нет данных для копирования', 'error');
+        return;
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        logCompression('Сжатый текст скопирован в буфер обмена', 'success');
+        showStatus('📋 Сжатый текст скопирован!');
+      }).catch(err => {
+        compressionElements.output.select();
+        document.execCommand('copy');
+        logCompression('Сжатый текст скопирован (старый метод)', 'success');
+        showStatus('📋 Сжатый текст скопирован!');
+      });
+    });
+
+    // Копирование распакованного текста
+    compressionElements.copyDecompressedBtn.addEventListener('click', function() {
+      const text = compressionElements.decompressed.value.trim();
+      if (!text) {
+        showStatus('Нет данных для копирования', 'error');
+        return;
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        logCompression('Распакованный текст скопирован в буфер обмена', 'success');
+        showStatus('📋 Распакованный текст скопирован!');
+      }).catch(err => {
+        compressionElements.decompressed.select();
+        document.execCommand('copy');
+        logCompression('Распакованный текст скопирован (старый метод)', 'success');
+        showStatus('📋 Распакованный текст скопирован!');
+      });
+    });
+
+    // Использование сжатого Base64 для изображения
+    compressionElements.useForImageBtn.addEventListener('click', function() {
+      const compressedText = compressionElements.output.value.trim();
+      if (!compressedText) {
+        showStatus('Нет сжатых данных', 'error');
+        return;
+      }
+
+      elements.base64Textarea.value = compressedText;
+      compressionElements.input.value = compressedText;
+      showStatus('✅ Сжатые данные перенесены в поле изображения');
+      logCompression('Сжатые данные перенесены в поле изображения');
+    });
+
+    // Использование распакованного Base64 для изображения
+    compressionElements.useDecompressedBtn.addEventListener('click', function() {
+      const decompressedText = compressionElements.decompressed.value.trim();
+      if (!decompressedText) {
+        showStatus('Нет распакованных данных', 'error');
+        return;
+      }
+
+      elements.base64Textarea.value = decompressedText;
+      compressionElements.input.value = decompressedText;
+      showStatus('✅ Распакованные данные перенесены в поле изображения');
+      logCompression('Распакованные данные перенесены в поле изображения');
+    });
+
+    // Сохранение сжатых данных
+    compressionElements.saveCompressedBtn.addEventListener('click', function() {
+      const compressedText = compressionElements.output.value.trim();
+      if (!compressedText) {
+        showStatus('Нет данных для сохранения', 'error');
+        return;
+      }
+
+      const resetButton = showButtonLoading(this, 'Сохранение...');
+
+      try {
+        const blob = new Blob([compressedText], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `compressed_base64_${currentAlgorithm}_${new Date().getTime()}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        showStatus('💾 Сжатые данные сохранены!');
+        logCompression(`Сжатые данные сохранены в файл: ${link.download}`);
+        resetButton();
+      } catch (error) {
+        showStatus('❌ Ошибка при сохранении: ' + error.message, 'error');
+        logCompression(`Ошибка сохранения: ${error.message}`, 'error');
+        resetButton();
+      }
+    });
+
+    // Проверка целостности
+    compressionElements.verifyIntegrityBtn.addEventListener('click', function() {
+      const originalText = compressionElements.input.value.trim();
+      const decompressedText = compressionElements.decompressed.value.trim();
+      
+      if (!originalText || !decompressedText) {
+        showStatus('Нет данных для проверки целостности', 'error');
+        return;
+      }
+      
+      const integrity = originalText === decompressedText;
+      
+      if (integrity) {
+        logCompression('Проверка целостности: ✅ Данные не повреждены', 'success');
+        showStatus('✅ Целостность данных сохранена!');
+      } else {
+        logCompression('Проверка целостности: ❌ Данные повреждены', 'error');
+        showStatus('❌ Целостность данных нарушена!', 'error');
+      }
+      
+      updateCompressionStats(
+        new TextEncoder().encode(originalText).length,
+        new TextEncoder().encode(compressionElements.output.value.trim()).length,
+        new TextEncoder().encode(decompressedText).length,
+        currentAlgorithm,
+        integrity
+      );
+    });
+
+    // Проверка валидности оригинального текста
+    compressionElements.validateOriginalBtn.addEventListener('click', function() {
+      const text = compressionElements.input.value.trim();
+      if (!text) {
+        showStatus('Нет данных для проверки', 'error');
+        return;
+      }
+
+      try {
+        atob(text);
+        logCompression('Исходный текст: ✅ Валидный Base64', 'success');
+        showStatus('✅ Исходный текст валиден!');
+      } catch (error) {
+        logCompression('Исходный текст: ❌ Невалидный Base64', 'error');
+        showStatus('❌ Исходный текст невалиден!', 'error');
+      }
+    });
+
+    // Загрузка из изображения
+    compressionElements.loadFromImageBtn.addEventListener('click', function() {
+      const imageBase64 = elements.base64Textarea.value.trim();
+      if (!imageBase64) {
+        showStatus('Сначала сгенерируйте Base64 из изображения', 'error');
+        return;
+      }
+
+      compressionElements.input.value = imageBase64;
+      logCompression('Base64 загружен из поля изображения', 'success');
+      showStatus('✅ Base64 загружен из изображения!');
+    });
+
+    // Поменять местами поля
+    compressionElements.swapFieldsBtn.addEventListener('click', function() {
+      const original = compressionElements.input.value;
+      const compressed = compressionElements.output.value;
+      
+      compressionElements.input.value = compressed;
+      compressionElements.output.value = original;
+      
+      logCompression('Поля "Исходный" и "Сжатый" поменяны местами');
+      showStatus('🔄 Поля поменяны местами');
+    });
+
+    // Очистка полей сжатия
+    compressionElements.clearCompressionBtn.addEventListener('click', function() {
+      compressionElements.input.value = '';
+      compressionElements.output.value = '';
+      compressionElements.decompressed.value = '';
+      compressionElements.compressionLog.innerHTML = '<div class="log-entry">Журнал сжатия: готов к работе</div>';
+      updateCompressionStats(0, 0, 0, '-', null);
+      showStatus('🗑️ Поля сжатия очищены');
+      logCompression('Все поля сжатия очищены', 'info');
+    });
+
+    // ========== СУЩЕСТВУЮЩИЕ ОБРАБОТЧИКИ ==========
 
     // Показ информации о файле
     function showFileInfo(file) {
@@ -446,7 +1295,6 @@
         return;
       }
 
-      // Проверка размера файла (увеличим лимит для desktop)
       if (file.size > 10 * 1024 * 1024) {
         showStatus('Изображение слишком большое. Выберите файл до 10MB.', 'error');
         return;
@@ -460,11 +1308,12 @@
           const fullDataUrl = e.target.result;
           const base64 = fullDataUrl.split(',')[1];
           elements.base64Textarea.value = base64;
+          compressionElements.input.value = base64;
           
-          // Показываем превью
           elements.inputPreview.innerHTML = `<img src="${fullDataUrl}" alt="Исходное изображение">`;
           
           showStatus(`✅ Изображение успешно преобразовано! Base64 длина: ${base64.length} символов`);
+          logCompression(`Base64 сгенерирован из изображения: ${formatFileSize(base64.length)}`);
         } catch (error) {
           showStatus('❌ Ошибка при преобразовании: ' + error.message, 'error');
         } finally {
@@ -491,7 +1340,6 @@
       const resetButton = showButtonLoading(this, 'Восстанавливаем...');
 
       try {
-        // Определяем MIME-тип
         let mimeType = 'image/png';
         if (base64.startsWith('/9j/') || base64.startsWith('/9j/4AAQ')) mimeType = 'image/jpeg';
         else if (base64.startsWith('R0lGODlh')) mimeType = 'image/gif';
@@ -500,7 +1348,6 @@
 
         const dataUrl = `data:${mimeType};base64,${base64}`;
         
-        // Создаем изображение для проверки
         const img = new Image();
         img.onload = function() {
           elements.outputPreview.innerHTML = `<img src="${dataUrl}" alt="Восстановленное изображение">`;
@@ -548,7 +1395,7 @@
       }
     });
 
-    // Загрузка Base64 из TXT-файла - ИСПРАВЛЕННАЯ ФУНКЦИЯ
+    // Загрузка Base64 из TXT-файла
     elements.txtInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) {
@@ -556,7 +1403,6 @@
         return;
       }
 
-      // Проверяем расширение файла
       if (!file.name.toLowerCase().endsWith('.txt')) {
         showStatus('Пожалуйста, выберите TXT-файл', 'error');
         this.value = '';
@@ -568,14 +1414,15 @@
         try {
           const text = e.target.result.trim();
           
-          // Проверяем, что загруженный текст похож на Base64
           if (text.length < 20 || !/^[A-Za-z0-9+/]*={0,2}$/.test(text)) {
             showStatus('Файл не содержит валидную Base64 строку', 'error');
             return;
           }
           
           elements.base64Textarea.value = text;
+          compressionElements.input.value = text;
           showStatus('📂 Base64 строка успешно загружена из файла!');
+          logCompression('Base64 строка загружена из файла', 'success');
         } catch (error) {
           showStatus('❌ Ошибка при загрузке файла: ' + error.message, 'error');
         }
@@ -599,7 +1446,6 @@
       navigator.clipboard.writeText(base64).then(() => {
         showStatus('📋 Base64 скопирован в буфер обмена!');
       }).catch(err => {
-        // Fallback для старых браузеров
         elements.base64Textarea.select();
         document.execCommand('copy');
         showStatus('📋 Base64 скопирован в буфер обмена!');
@@ -615,11 +1461,12 @@
       }
 
       try {
-        // Простая проверка Base64
-        const binaryString = atob(base64);
+        atob(base64);
         showStatus('✅ Base64 строка валидна!');
+        logCompression('Base64 строка проверена - валидна', 'success');
       } catch (error) {
         showStatus('❌ Base64 строка невалидна', 'error');
+        logCompression('Base64 строка проверена - невалидна', 'error');
       }
     });
 
@@ -628,10 +1475,16 @@
       elements.imageInput.value = '';
       elements.txtInput.value = '';
       elements.base64Textarea.value = '';
+      compressionElements.input.value = '';
+      compressionElements.output.value = '';
+      compressionElements.decompressed.value = '';
       elements.inputPreview.innerHTML = '<div class="preview-placeholder">Здесь появится выбранное изображение</div>';
       elements.outputPreview.innerHTML = '<div class="preview-placeholder">Здесь появится восстановленное изображение</div>';
       elements.fileInfo.style.display = 'none';
+      compressionElements.compressionLog.innerHTML = '<div class="log-entry">Журнал сжатия: готов к работе</div>';
+      updateCompressionStats(0, 0, 0, '-', null);
       showStatus('🗑️ Все данные очищены');
+      logCompression('Все поля очищены', 'info');
     });
 
     // Показ превью при выборе изображения
@@ -655,9 +1508,12 @@
       reader.readAsDataURL(file);
     });
 
-    // Автофокус на текстовую область при загрузке
+    // Инициализация
     window.addEventListener('load', function() {
       showStatus('👆 Выберите изображение или вставьте Base64 строку для начала работы', 'info');
+      initAlgorithmButtons();
+      syncBase64Fields();
+      logCompression('Инструмент сжатия Base64 инициализирован', 'info');
     });
 
     // Горячие клавиши
@@ -671,11 +1527,29 @@
           case 'c':
             if (elements.base64Textarea === document.activeElement) {
               elements.copyBase64Btn.click();
+            } else if (compressionElements.output === document.activeElement) {
+              compressionElements.copyCompressedBtn.click();
+            } else if (compressionElements.decompressed === document.activeElement) {
+              compressionElements.copyDecompressedBtn.click();
+            } else if (compressionElements.input === document.activeElement) {
+              compressionElements.copyOriginalBtn.click();
             }
             break;
           case 'd':
             e.preventDefault();
             elements.clearAllBtn.click();
+            break;
+          case '1':
+            e.preventDefault();
+            compressionElements.compressBtn.click();
+            break;
+          case '2':
+            e.preventDefault();
+            compressionElements.decompressBtn.click();
+            break;
+          case '3':
+            e.preventDefault();
+            compressionElements.autoCompressBtn.click();
             break;
         }
       }
@@ -685,11 +1559,14 @@
     const tooltips = {
       saveToTxtBtn: 'Ctrl+S',
       copyBase64Btn: 'Ctrl+C',
-      clearAllBtn: 'Ctrl+D'
+      clearAllBtn: 'Ctrl+D',
+      compressBtn: 'Ctrl+1',
+      decompressBtn: 'Ctrl+2',
+      autoCompressBtn: 'Ctrl+3'
     };
 
     Object.keys(tooltips).forEach(btnId => {
-      const btn = elements[btnId];
+      const btn = elements[btnId] || compressionElements[btnId];
       if (btn) {
         btn.title = tooltips[btnId];
       }
